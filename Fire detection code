@@ -1,0 +1,40 @@
+#include "main.h"
+#include "i2c-lcd.h"
+#define FLAME_PIN GPIO_PIN_1
+#define FLAME_PORT GPIOA
+#define BUZZER_PIN GPIO_PIN_8
+#define BUZZER_PORT GPIOB
+int main(void)
+{
+ HAL_Init();
+ SystemClock_Config();
+ MX_GPIO_Init();
+ MX_I2C1_Init();
+ lcd_init();
+ lcd_clear();
+ lcd_put_cur(0,0);
+ lcd_send_string("Fire Detector");
+ HAL_Delay(2000);
+ while (1)
+ {
+ if(HAL_GPIO_ReadPin(FLAME_PORT, FLAME_PIN) == GPIO_PIN_RESET)
+ {
+ HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_SET);
+ lcd_clear();
+lcd_put_cur(0,0);
+ lcd_send_string("FIRE ALERT!");
+ lcd_put_cur(1,0);
+ lcd_send_string("Flame Detected");
+ }
+ else
+ {
+ HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_RESET);
+ lcd_clear();
+ lcd_put_cur(0,0);
+ lcd_send_string("System Normal");
+ lcd_put_cur(1,0);
+ lcd_send_string("No Fire");
+ }
+ HAL_Delay(500);
+ }
+}
